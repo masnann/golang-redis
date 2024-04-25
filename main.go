@@ -10,20 +10,21 @@ import (
 )
 
 func main() {
-	if err := db.RedisInit(); err != nil {
-		panic(err)
-	}
+	db.RedisInit()
 
+	rdb := db.RedisConnect()
+	redisRepo := repository.NewRedisRepository(rdb)
+	redisService := service.NewRedisService(redisRepo)
 	e := echo.New()
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	redisRepo := repository.NewRedisRepository(db.RedisConnect())
-	redisService := service.NewRedisService(redisRepo)
+
 
 	// Routes
 	e.POST("/api/v1/redis/insert", redisService.Insert)
+	e.GET("/api/v1/redis/get/:key", redisService.GetData)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))

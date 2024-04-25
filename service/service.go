@@ -36,3 +36,14 @@ func (s RedisService) Insert(ctx echo.Context) error {
 		"message": "Data inserted successfully to Redis",
 	})
 }
+
+func (s RedisService) GetData(ctx echo.Context) error {
+	key := ctx.Param("key")
+
+	data, err := s.repo.GetData(key)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, data)
+}

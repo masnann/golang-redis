@@ -1,22 +1,26 @@
 package db
 
-import "github.com/go-redis/redis"
+import (
+	"context"
+	"fmt"
+	"github.com/go-redis/redis/v8"
+)
 
 var rdb *redis.Client
 
 func RedisInit() error {
-	db := redis.NewClient(&redis.Options{
+	rdb = redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "",
 		DB:       0,
 	})
 
-	_, err := db.Ping().Result()
+	ctx := context.Background()
+	_, err := rdb.Ping(ctx).Result()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to ping Redis server: %v", err)
 	}
 
-	rdb = db
 	return nil
 }
 
